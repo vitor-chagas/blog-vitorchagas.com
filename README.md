@@ -1,5 +1,7 @@
 # Blog vitorchagas.com
 
+Live at **[vitorchagas.com](https://vitorchagas.com)**
+
 Personal blog and portfolio built with [Astro](https://astro.build/) and [TailwindCSS](https://tailwindcss.com/).
 
 Covers programming, sports, financial markets, DeFi, and lessons learned from shipping products.

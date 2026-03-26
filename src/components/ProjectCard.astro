@@ -1,0 +1,40 @@
+---
+interface Props {
+  project: {
+    id: string;
+    data: {
+      title: string;
+      description: string;
+      coverImage: string;
+      stack?: string[];
+    };
+  };
+}
+
+const { project } = Astro.props;
+---
+
+<a href={`/projects/${project.id}`} class="group block bg-card border border-card-border rounded-xl overflow-hidden hover:border-muted transition-colors duration-200">
+  <div class="aspect-[4/3] bg-tag-bg overflow-hidden">
+    <img
+      src={project.data.coverImage}
+      alt={project.data.title}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    />
+  </div>
+  <div class="p-5">
+    <h2 class="text-base font-semibold text-heading">{project.data.title}</h2>
+    {project.data.stack && project.data.stack.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mt-2">
+        {project.data.stack.map((item) => (
+          <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">
+            {item}
+          </span>
+        ))}
+      </div>
+    )}
+    <p class="text-sm text-subtle mt-2 leading-relaxed line-clamp-2">
+      {project.data.description}
+    </p>
+  </div>
+</a>

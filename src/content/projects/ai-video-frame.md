@@ -1,31 +1,39 @@
 ---
-title: ai-video-frame
+title: AI Video Frame
 description: Extract frames from videos using AI-driven scene detection.
-githubUrl: https://github.com/vitorchagas/ai-video-frame
+coverImage: /projects/ai-video-frame/cover.png
+images:
+  - /projects/ai-video-frame/screenshot-1.png
+  - /projects/ai-video-frame/screenshot-2.png
+  - /projects/ai-video-frame/screenshot-3.png
+year: 2024
+stack: ["Python", "FFmpeg", "OpenCV"]
+contributions: ["Backend", "CLI", "Algorithm"]
 tags: ["python", "ai", "video", "cli"]
+githubUrl: https://github.com/vitorchagas/ai-video-frame
 status: active
 ---
 
-`ai-video-frame` is a tool for extracting meaningful frames from video files using AI-powered scene change detection.
-
 ## Overview
+
+`ai-video-frame` is a tool for extracting meaningful frames from video files using AI-powered scene change detection.
 
 Instead of dumping every N-th frame, `ai-video-frame` analyzes the video stream and picks frames at semantically significant moments — scene cuts, motion peaks, and visual changes.
 
-## Features
+## What it does
 
 - Scene-change detection via perceptual hashing
 - Configurable sensitivity threshold
 - Outputs as JPEG/PNG with timestamps in filenames
 - CLI and Python API
 
-## Usage
+### Usage
 
 ```bash
 ai-video-frame extract input.mp4 --output ./frames --threshold 0.3
 ```
 
-## Configuration
+### Configuration
 
 | Option | Default | Description |
 |---|---|---|
@@ -33,7 +41,7 @@ ai-video-frame extract input.mp4 --output ./frames --threshold 0.3
 | `--format` | `jpeg` | Output format (`jpeg` or `png`) |
 | `--max-frames` | unlimited | Cap on extracted frames |
 
-## How it works
+### How it works
 
 1. Decode video with FFmpeg
 2. Compute perceptual hash (pHash) for each frame

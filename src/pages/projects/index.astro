@@ -1,75 +1,46 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
 ---
 
 <BaseLayout
   title="Projects"
-  description="Tools and open-source projects I've built at the intersection of AI and video."
+  description="Products, tools, and experiments I've built."
 >
   <div class="px-8 sm:px-12 py-10">
-    <div class="mb-14">
-      <h1 class="text-3xl font-bold text-heading tracking-tight mb-3">Projects</h1>
-      <p class="text-subtle">
-        Tools I've built, mostly at the intersection of AI and video.
-      </p>
+
+    <!-- Hero -->
+    <div class="flex items-start justify-between gap-8 mb-14">
+      <div class="flex-1 min-w-0">
+        <h1 class="text-4xl font-bold text-heading tracking-tight mb-2">
+          Things I've built
+        </h1>
+        <p class="text-xl text-muted italic mb-6">
+          Products, tools, and experiments
+        </p>
+        <p class="text-base text-body leading-relaxed max-w-lg">
+          I like building things from the ground up. These are side
+          projects, tools, and products I've shipped outside of my day job.
+        </p>
+      </div>
+      <div class="hidden md:block shrink-0">
+        <img
+          src={projects[0]?.data.coverImage}
+          alt=""
+          class="w-64 rounded-xl border border-card-border shadow-sm"
+        />
+      </div>
     </div>
 
-    <div id="github-repos"></div>
+    <!-- Project Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {projects.map((project) => (
+        <ProjectCard project={project} />
+      ))}
+    </div>
+
   </div>
 </BaseLayout>
-
-<script>
-  async function loadRepos() {
-    const container = document.getElementById('github-repos');
-    if (!container) return;
-
-    try {
-      const res = await fetch('https://api.github.com/users/vitor-chagas/repos?type=public&sort=updated&per_page=100', {
-        headers: { 'Accept': 'application/vnd.github+json' },
-      });
-      if (!res.ok) return;
-
-      const data = await res.json();
-      const repos = data.filter((r: any) => !r.fork && !r.archived);
-      if (repos.length === 0) return;
-
-      container.innerHTML = `
-        <div class="flex items-center justify-end mb-6">
-          <a
-            href="https://github.com/vitor-chagas"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-xs text-muted hover:text-subtle transition-colors duration-150"
-          >
-            View all on GitHub ↗
-          </a>
-        </div>
-        <ul class="divide-y divide-border">
-          ${repos.map((repo: any) => `
-            <li class="group py-5 first:pt-0">
-              <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="block">
-                <div class="flex items-start justify-between gap-4">
-                  <div class="min-w-0">
-                    <h2 class="text-base font-semibold text-heading group-hover:text-accent transition-colors duration-150">
-                      ${repo.name}
-                    </h2>
-                    ${repo.description ? `<p class="text-sm text-subtle mt-1.5 leading-relaxed">${repo.description}</p>` : ''}
-                    <div class="flex flex-wrap items-center gap-3 mt-2">
-                      ${repo.language ? `<span class="text-xs text-muted">${repo.language}</span>` : ''}
-                      ${repo.stargazers_count > 0 ? `<span class="text-xs text-muted">★ ${repo.stargazers_count}</span>` : ''}
-                      ${repo.topics.slice(0, 4).map((topic: string) => `
-                        <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">${topic}</span>
-                      `).join('')}
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </li>
-          `).join('')}
-        </ul>
-      `;
-    } catch (_) {}
-  }
-
-  loadRepos();
-</script>
