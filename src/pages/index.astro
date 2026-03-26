@@ -61,7 +61,7 @@ const stack = ['Python', 'Spark', 'Cloud', 'Databricks', 'Databases', 'Docker', 
       <span class="text-xs font-semibold text-muted tracking-widest uppercase">Certifications</span>
       <div class="flex-1 h-px bg-border" />
     </div>
-    <div class="flex flex-nowrap justify-center gap-4 overflow-x-auto">
+    <div class="flex flex-nowrap justify-center gap-2">
       {[
         { name: 'Azure Solutions Architect Expert', badge: '/badges/azure-solutions-architect-expert.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/5D14CCC477522E38?sharingId=240D4786A0A0345D' },
         { name: 'Azure Administrator Associate', badge: '/badges/azure-administrator-associate.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/F93F8DB39831268D?sharingId=240D4786A0A0345D' },
@@ -74,7 +74,7 @@ const stack = ['Python', 'Spark', 'Cloud', 'Databricks', 'Databases', 'Docker', 
           href={cert.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="group flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-card-border hover:bg-card transition-all duration-200 w-32 shrink-0"
+          class="group flex flex-col items-center gap-2 px-3 py-3 rounded-2xl border border-transparent hover:border-card-border hover:bg-card transition-all duration-200 flex-1 min-w-0"
         >
           <img
             src={cert.badge}
