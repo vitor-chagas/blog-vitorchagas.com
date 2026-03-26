@@ -1,31 +1,5 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
-type GitHubRepo = {
-  id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
-  topics: string[];
-  stargazers_count: number;
-  language: string | null;
-  fork: boolean;
-  archived: boolean;
-  updated_at: string;
-};
-
-let githubRepos: GitHubRepo[] = [];
-try {
-  const res = await fetch('https://api.github.com/users/vitor-chagas/repos?type=public&sort=updated&per_page=100', {
-    headers: { 'Accept': 'application/vnd.github+json' },
-  });
-  if (res.ok) {
-    const data: GitHubRepo[] = await res.json();
-    githubRepos = data.filter(r => !r.fork && !r.archived);
-  }
-} catch (_) {}
 ---
 
 <BaseLayout
@@ -40,8 +14,26 @@ try {
       </p>
     </div>
 
-    {githubRepos.length > 0 && (
-      <div>
+    <div id="github-repos"></div>
+  </div>
+</BaseLayout>
+
+<script>
+  async function loadRepos() {
+    const container = document.getElementById('github-repos');
+    if (!container) return;
+
+    try {
+      const res = await fetch('https://api.github.com/users/vitor-chagas/repos?type=public&sort=updated&per_page=100', {
+        headers: { 'Accept': 'application/vnd.github+json' },
+      });
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const repos = data.filter((r: any) => !r.fork && !r.archived);
+      if (repos.length === 0) return;
+
+      container.innerHTML = `
         <div class="flex items-center justify-end mb-6">
           <a
             href="https://github.com/vitor-chagas"
@@ -53,44 +45,31 @@ try {
           </a>
         </div>
         <ul class="divide-y divide-border">
-          {githubRepos.map((repo) => (
+          ${repos.map((repo: any) => `
             <li class="group py-5 first:pt-0">
-              <a
-                href={repo.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block"
-              >
+              <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="block">
                 <div class="flex items-start justify-between gap-4">
                   <div class="min-w-0">
                     <h2 class="text-base font-semibold text-heading group-hover:text-accent transition-colors duration-150">
-                      {repo.name}
+                      ${repo.name}
                     </h2>
-                    {repo.description && (
-                      <p class="text-sm text-subtle mt-1.5 leading-relaxed">
-                        {repo.description}
-                      </p>
-                    )}
+                    ${repo.description ? `<p class="text-sm text-subtle mt-1.5 leading-relaxed">${repo.description}</p>` : ''}
                     <div class="flex flex-wrap items-center gap-3 mt-2">
-                      {repo.language && (
-                        <span class="text-xs text-muted">{repo.language}</span>
-                      )}
-                      {repo.stargazers_count > 0 && (
-                        <span class="text-xs text-muted">★ {repo.stargazers_count}</span>
-                      )}
-                      {repo.topics.slice(0, 4).map((topic) => (
-                        <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">
-                          {topic}
-                        </span>
-                      ))}
+                      ${repo.language ? `<span class="text-xs text-muted">${repo.language}</span>` : ''}
+                      ${repo.stargazers_count > 0 ? `<span class="text-xs text-muted">★ ${repo.stargazers_count}</span>` : ''}
+                      ${repo.topics.slice(0, 4).map((topic: string) => `
+                        <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">${topic}</span>
+                      `).join('')}
                     </div>
                   </div>
                 </div>
               </a>
             </li>
-          ))}
+          `).join('')}
         </ul>
-      </div>
-    )}
-  </div>
-</BaseLayout>
+      `;
+    } catch (_) {}
+  }
+
+  loadRepos();
+</script>

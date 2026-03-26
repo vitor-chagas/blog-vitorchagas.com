@@ -40,6 +40,12 @@ npm run build      # Production build to ./dist/
 npm run preview    # Preview production build
 ```
 
+### Docker
+
+```bash
+docker compose up --build   # Runs at localhost:8080
+```
+
 ## License
 
 All rights reserved.
