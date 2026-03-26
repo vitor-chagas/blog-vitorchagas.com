@@ -1,0 +1,76 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="px-8 sm:px-12 py-10">
+    <header class="mb-10">
+      <div class="mb-5">
+        <a href="/blog" class="text-xs text-muted hover:text-subtle transition-colors duration-150">
+          ← Writing
+        </a>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold text-heading tracking-tight leading-snug mb-4">
+        {post.data.title}
+      </h1>
+      <div class="flex flex-wrap items-center gap-3">
+        <time datetime={post.data.pubDate.toISOString()} class="text-sm text-muted tabular-nums">
+          {formattedDate}
+        </time>
+        {post.data.tags && post.data.tags.length > 0 && (
+          <>
+            <span class="text-border" aria-hidden="true">·</span>
+            <div class="flex flex-wrap gap-1.5">
+              {post.data.tags.map((tag) => (
+                <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </header>
+
+    <div class="prose prose-base max-w-none
+      prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-heading
+      prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
+      prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3
+      prose-p:leading-relaxed prose-p:text-body
+      prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent-hover hover:prose-a:underline
+      prose-code:text-accent-hover prose-code:font-normal prose-code:bg-code-bg prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+      prose-pre:bg-code-bg prose-pre:border prose-pre:border-border prose-pre:rounded-lg
+      prose-blockquote:border-border prose-blockquote:text-subtle
+      prose-hr:border-border
+      prose-table:text-sm
+      prose-th:text-heading prose-th:font-semibold
+      prose-strong:text-heading prose-strong:font-semibold
+      prose-li:text-body">
+      <Content />
+    </div>
+
+    <footer class="mt-14 pt-8 border-t border-border">
+      <a href="/blog" class="text-sm text-muted hover:text-heading transition-colors duration-150">
+        ← Back to writing
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

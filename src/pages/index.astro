@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TickerTape from '../components/TickerTape.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const projects = await getCollection('projects');
+
+const stack = ['Python', 'Spark', 'Cloud', 'Databricks', 'Databases', 'Docker', 'Azure Network', 'Artificial Intelligence', 'ETL', 'Data', 'DevOps', 'MLOps'];
+---
+
+<BaseLayout title="Vitor Chagas">
+
+  <!-- Hero -->
+  <section class="px-8 sm:px-12 pt-12 pb-10">
+    <div class="flex items-start justify-between gap-10">
+      <div class="flex-1 min-w-0">
+        <h1 class="text-4xl font-bold text-heading tracking-tight mb-2">
+          Data & DevOps Engineer
+        </h1>
+        <p class="text-xl text-muted italic mb-7">
+          Writing about the things I actually care about.
+        </p>
+        <p class="text-base text-body leading-relaxed max-w-lg">
+          Here I write about programming, sports, financial markets, and decentralized finance,
+          the topics that genuinely keep me curious. No particular agenda, just things worth thinking about.
+        </p>
+        <p class="text-sm text-muted mt-3 max-w-lg">
+          Currently working as Engineer at Rabobank, one of the world's safest banks and the leading global food and agriculture bank.
+        </p>
+      </div>
+      <div class="shrink-0 hidden sm:flex flex-col items-center gap-3">
+        <img
+          src="/avatar.png"
+          alt="Vitor Chagas"
+          class="w-44 h-44 rounded-full object-cover border-2 border-card-border"
+        />
+        <a
+          href="/CV Vitor Chagas - Data DevOps Engineer.pdf"
+          download
+          class="w-full text-center text-xs font-medium text-muted border border-border rounded-lg px-4 py-2 hover:text-heading hover:border-heading transition-colors duration-150"
+        >
+          Download CV
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ticker tape -->
+  <div class="px-8 sm:px-12 pb-8">
+    <TickerTape />
+  </div>
+
+  <!-- Certifications -->
+  <section class="px-8 sm:px-12 py-8 border-t border-border">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="flex-1 h-px bg-border" />
+      <span class="text-xs font-semibold text-muted tracking-widest uppercase">Certifications</span>
+      <div class="flex-1 h-px bg-border" />
+    </div>
+    <div class="flex flex-nowrap justify-center gap-4 overflow-x-auto">
+      {[
+        { name: 'Azure Solutions Architect Expert', badge: '/badges/azure-solutions-architect-expert.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/5D14CCC477522E38?sharingId=240D4786A0A0345D' },
+        { name: 'Azure Administrator Associate', badge: '/badges/azure-administrator-associate.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/F93F8DB39831268D?sharingId=240D4786A0A0345D' },
+        { name: 'Azure Data Engineer Associate', badge: '/badges/associate.webp', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/3146814E8D8B86E6?sharingId=240D4786A0A0345D' },
+        { name: 'Fabric Data Engineer Associate', badge: '/badges/associate.webp', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/6B068CDA7EEE6EF6?sharingId=240D4786A0A0345D' },
+        { name: 'Power BI Data Analyst Associate', badge: '/badges/power-bi-data-analyst-associate.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/5FA6DB1EA2F640E8?sharingId=240D4786A0A0345D' },
+        { name: 'Azure Data Fundamentals', badge: '/badges/azure-data-fundamentals.png', url: 'https://learn.microsoft.com/api/credentials/share/en-us/VitorChagas-0911/CB4896A72ED44362?sharingId=240D4786A0A0345D' },
+      ].map((cert) => (
+        <a
+          href={cert.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-card-border hover:bg-card transition-all duration-200 w-32 shrink-0"
+        >
+          <img
+            src={cert.badge}
+            alt={`${cert.name} Badge`}
+            class="w-16 h-16 drop-shadow-sm group-hover:scale-105 transition-transform duration-200"
+          />
+          <span class="text-xs font-medium text-heading text-center leading-snug">
+            {cert.name}
+          </span>
+          <span class="text-[10px] text-muted group-hover:text-accent transition-colors duration-150">
+            Verify ↗
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Stack -->
+  <section class="px-8 sm:px-12 py-8 border-t border-border">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="flex-1 h-px bg-border" />
+      <span class="text-xs font-semibold text-muted tracking-widest uppercase">My Stack</span>
+      <div class="flex-1 h-px bg-border" />
+    </div>
+    <div class="flex flex-wrap gap-2 justify-center">
+      {stack.map((tool) => (
+        <span class="px-3 py-1 text-sm text-subtle border border-tag-border rounded-full bg-tag-bg">
+          {tool}
+        </span>
+      ))}
+    </div>
+  </section>
+
+  <!-- Recent Writing -->
+  <section class="px-8 sm:px-12 py-10 border-t border-border">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="flex-1 h-px bg-border" />
+      <span class="text-xs font-semibold text-muted tracking-widest uppercase">Recent Writing</span>
+      <div class="flex-1 h-px bg-border" />
+    </div>
+    <ul class="space-y-6">
+      {posts.map((post) => (
+        <li class="group flex items-start gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-accent shrink-0" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline justify-between gap-4">
+              <a
+                href={`/blog/${post.id}`}
+                class="text-base font-semibold text-heading hover:text-accent transition-colors duration-150"
+              >
+                {post.data.title}
+              </a>
+              <time
+                datetime={post.data.pubDate.toISOString()}
+                class="shrink-0 text-xs text-muted tabular-nums"
+              >
+                {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+            </div>
+            <p class="text-sm text-subtle mt-0.5 leading-relaxed">
+              {post.data.description}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-8 text-center">
+      <a href="/blog" class="text-sm text-muted hover:text-accent transition-colors duration-150">
+        All posts →
+      </a>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="px-8 sm:px-12 py-10 border-t border-border">
+    <div class="flex items-center gap-4 mb-8">
+      <div class="flex-1 h-px bg-border" />
+      <span class="text-xs font-semibold text-muted tracking-widest uppercase">Projects</span>
+      <div class="flex-1 h-px bg-border" />
+    </div>
+    <ul class="divide-y divide-border">
+      {projects.map((project) => (
+        <li class="group py-5 first:pt-0">
+          <a
+            href={`/projects/${project.id}`}
+            class="block"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <h2 class="text-base font-semibold text-heading group-hover:text-accent transition-colors duration-150">
+                  {project.data.title}
+                </h2>
+                <p class="text-sm text-subtle mt-1.5 leading-relaxed">
+                  {project.data.description}
+                </p>
+                {project.data.tags && project.data.tags.length > 0 && (
+                  <div class="flex flex-wrap items-center gap-3 mt-2">
+                    {project.data.tags.slice(0, 4).map((tag) => (
+                      <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {project.data.githubUrl && (
+                <span class="shrink-0 text-xs text-muted group-hover:text-subtle transition-colors duration-150">
+                  GitHub ↗
+                </span>
+              )}
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+</BaseLayout>

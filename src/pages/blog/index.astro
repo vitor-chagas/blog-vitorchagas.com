@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const postsByYear = posts.reduce<Record<number, typeof posts>>((acc, post) => {
+  const year = post.data.pubDate.getFullYear();
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(post);
+  return acc;
+}, {});
+
+const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
+---
+
+<BaseLayout
+  title="Writing"
+  description="Articles on AI, video tooling, architecture, and lessons from shipping things."
+>
+  <div class="px-8 sm:px-12 py-10">
+    <div class="mb-14">
+      <h1 class="text-3xl font-bold text-heading tracking-tight mb-3">Writing</h1>
+      <p class="text-subtle">
+        {posts.length} post{posts.length !== 1 ? 's' : ''} on AI, video, and building things.
+      </p>
+    </div>
+
+    <div class="space-y-14">
+      {years.map((year) => (
+        <div>
+          <div class="flex items-center gap-4 mb-6">
+            <span class="text-sm font-semibold text-muted tabular-nums">{year}</span>
+            <div class="flex-1 h-px bg-border" />
+          </div>
+          <ul class="space-y-7">
+            {postsByYear[year].map((post) => (
+              <li class="group">
+                <a href={`/blog/${post.id}`} class="flex items-start justify-between gap-6">
+                  <div class="min-w-0">
+                    <h2 class="text-base font-medium text-heading group-hover:text-accent transition-colors duration-150">
+                      {post.data.title}
+                    </h2>
+                    <p class="text-sm text-subtle mt-1 leading-relaxed">
+                      {post.data.description}
+                    </p>
+                    {post.data.tags && post.data.tags.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mt-2">
+                        {post.data.tags.map((tag) => (
+                          <span class="text-xs px-2 py-0.5 bg-tag-bg border border-tag-border text-muted rounded-full">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <time
+                    datetime={post.data.pubDate.toISOString()}
+                    class="shrink-0 text-xs text-muted tabular-nums pt-0.5"
+                  >
+                    {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </time>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

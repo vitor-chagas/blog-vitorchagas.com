@@ -1,0 +1,149 @@
+---
+const cryptoSymbols  = ['BTC', 'ETH', 'SOL'];
+const marketSymbols  = ['DJI', 'SPX', 'NDX', 'VIX'];
+const commodSymbols  = ['GOLD', 'OIL'];
+const allSymbols     = [...cryptoSymbols, 'F&G', ...marketSymbols, ...commodSymbols];
+---
+
+<div class="overflow-hidden bg-black rounded-lg select-none" aria-hidden="true">
+  <div id="ticker-track" class="flex whitespace-nowrap py-2.5">
+    {[0, 1].map(() => (
+      <div class="ticker-row inline-flex items-center shrink-0">
+        {allSymbols.map((sym) => (
+          <span class="inline-flex items-center gap-2.5 px-5 text-[12px] font-mono uppercase">
+            <span class="ticker-label">{sym}</span>
+            <span data-price={sym} class="ticker-price">—</span>
+            <span data-change={sym} class="ticker-change"></span>
+            <span class="ticker-sep">◆</span>
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  #ticker-track {
+    animation: ticker-scroll 55s linear infinite;
+  }
+  #ticker-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-label {
+    color: #f5a623;
+    opacity: 0.6;
+    text-shadow: 0 0 6px rgba(245, 166, 35, 0.4);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+  .ticker-price {
+    color: #f5a623;
+    text-shadow: 0 0 8px rgba(245, 166, 35, 0.7);
+    font-weight: 500;
+  }
+  .ticker-change {
+    font-weight: 500;
+  }
+  .ticker-change.up        { color: #4ade80; text-shadow: 0 0 6px rgba(74,222,128,0.5); }
+  .ticker-change.down      { color: #f87171; text-shadow: 0 0 6px rgba(248,113,113,0.5); }
+  .ticker-change.neutral   { color: #94a3b8; }
+  .ticker-change.greed     { color: #4ade80; text-shadow: 0 0 6px rgba(74,222,128,0.5); }
+  .ticker-change.fear      { color: #f87171; text-shadow: 0 0 6px rgba(248,113,113,0.5); }
+  .ticker-change.ext-greed { color: #22c55e; text-shadow: 0 0 8px rgba(34,197,94,0.7); }
+  .ticker-change.ext-fear  { color: #ef4444; text-shadow: 0 0 8px rgba(239,68,68,0.7); }
+  .ticker-sep {
+    color: #f5a623;
+    opacity: 0.2;
+    font-size: 8px;
+  }
+</style>
+
+<script>
+  function fmt(n: number, decimals = 0) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+
+  function setPrice(sym: string, text: string) {
+    document.querySelectorAll(`[data-price="${sym}"]`).forEach(el => { el.textContent = text; });
+  }
+
+  function setChange(sym: string, text: string, cls: string) {
+    document.querySelectorAll(`[data-change="${sym}"]`).forEach(el => {
+      el.textContent = text;
+      el.className = `ticker-change ${cls}`;
+    });
+  }
+
+  function updatePrice(sym: string, price: number, changePct: number) {
+    setPrice(sym, `$${fmt(price)}`);
+    const sign = changePct >= 0 ? '+' : '';
+    setChange(sym, `${sign}${changePct.toFixed(2)}%`, changePct >= 0 ? 'up' : 'down');
+  }
+
+  // --- Binance WebSocket: BTC, ETH, SOL ---
+  const ws = new WebSocket(
+    'wss://stream.binance.com:9443/stream?streams=btcusdt@ticker/ethusdt@ticker/solusdt@ticker'
+  );
+  ws.onmessage = (e) => {
+    const { stream, data } = JSON.parse(e.data);
+    const map: Record<string, string> = {
+      'btcusdt@ticker': 'BTC',
+      'ethusdt@ticker': 'ETH',
+      'solusdt@ticker': 'SOL',
+    };
+    const sym = map[stream];
+    if (sym) updatePrice(sym, parseFloat(data.c), parseFloat(data.P));
+  };
+
+  // --- Yahoo Finance: DJI, SPX, NDX, VIX, GOLD, OIL ---
+  async function fetchMarkets() {
+    try {
+      const symbols = encodeURIComponent('^DJI,^GSPC,^NDX,^VIX,GC=F,CL=F');
+      const res = await fetch(
+        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      const json = await res.json();
+      const map: Record<string, string> = {
+        '^DJI': 'DJI', '^GSPC': 'SPX', '^NDX': 'NDX',
+        '^VIX': 'VIX', 'GC=F': 'GOLD', 'CL=F': 'OIL',
+      };
+      for (const item of json.quoteResponse?.result ?? []) {
+        const sym = map[item.symbol];
+        if (sym) updatePrice(sym, item.regularMarketPrice, item.regularMarketChangePercent);
+      }
+    } catch { /* silent */ }
+  }
+  fetchMarkets();
+  setInterval(fetchMarkets, 60_000);
+
+  // --- Crypto Fear & Greed Index (Alternative.me) ---
+  async function fetchFearGreed() {
+    try {
+      const res = await fetch('https://api.alternative.me/fng/?limit=1', {
+        signal: AbortSignal.timeout(5000)
+      });
+      const json = await res.json();
+      const { value, value_classification } = json.data[0];
+      const v = parseInt(value);
+
+      setPrice('F&G', value);
+
+      let cls = 'neutral';
+      if (v <= 25)      cls = 'ext-fear';
+      else if (v <= 45) cls = 'fear';
+      else if (v <= 55) cls = 'neutral';
+      else if (v <= 75) cls = 'greed';
+      else              cls = 'ext-greed';
+
+      setChange('F&G', value_classification.toUpperCase(), cls);
+    } catch { /* silent */ }
+  }
+  fetchFearGreed();
+  setInterval(fetchFearGreed, 5 * 60_000); // updates once/day but poll every 5min
+</script>
