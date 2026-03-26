@@ -1,4 +1,4 @@
-# vitorchagas.com
+# Blog vitorchagas.com
 
 Personal blog and portfolio built with [Astro](https://astro.build/) and [TailwindCSS](https://tailwindcss.com/).
 
@@ -18,20 +18,17 @@ Covers programming, sports, financial markets, DeFi, and lessons learned from sh
 - TailwindCSS 4 with `@tailwindcss/typography`
 - TypeScript (strict mode)
 - Zod for content schema validation
-- Sharp for image optimization
-
 ## Project Structure
 
 ```
 src/
 ├── pages/           # Routes (index, blog, projects)
 ├── layouts/         # Base layout with nav and footer
-├── components/      # TickerTape, BtcTicker
+├── components/      # TickerTape (live market data)
 ├── content/
 │   ├── blog/        # Markdown blog posts
 │   └── projects/    # Markdown project pages
-├── styles/          # Global CSS and Tailwind theme
-└── assets/          # Images and icons
+└── styles/          # Global CSS and Tailwind theme
 ```
 
 ## Getting Started
