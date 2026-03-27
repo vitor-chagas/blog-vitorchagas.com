@@ -24,6 +24,7 @@ const projects = defineCollection({
 		contributions: z.array(z.string()).optional(),
 		githubUrl: z.string().url().optional(),
 		liveUrl: z.string().url().optional(),
+		apiUrl: z.string().url().optional(),
 		tags: z.array(z.string()).optional(),
 		status: z.enum(['active', 'archived', 'wip']).optional().default('active'),
 	}),
