@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -42,6 +43,7 @@ const navLink = (active: boolean) =>
       rel="stylesheet"
     />
     <title>{fullTitle}</title>
+    <ClientRouter />
   </head>
 
   <body class="min-h-screen p-3 sm:p-6 lg:p-10 flex flex-col items-center text-body">

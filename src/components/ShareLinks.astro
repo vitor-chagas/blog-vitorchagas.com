@@ -65,7 +65,7 @@ const encodedTitle = encodeURIComponent(title);
 </div>
 
 <script define:vars={{ url }}>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const btn = document.querySelector('[data-copy-url]');
     if (!btn) return;
     btn.addEventListener('click', async () => {
