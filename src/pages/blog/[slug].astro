@@ -58,6 +58,7 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
       prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent-hover hover:prose-a:underline
       prose-code:text-accent-hover prose-code:font-normal prose-code:bg-code-bg prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
       prose-pre:bg-code-bg prose-pre:border prose-pre:border-border prose-pre:rounded-lg
+      [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:rounded-none [&_pre_code]:text-white
       prose-blockquote:border-border prose-blockquote:text-subtle
       prose-hr:border-border
       prose-table:text-sm
@@ -73,4 +74,40 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
       </a>
     </footer>
   </article>
+
+  <script>
+    async function renderMermaid() {
+      const preBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
+      if (preBlocks.length === 0) return;
+
+      const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          nodeBorder: '#f97316',
+          edgeLabelBackground: 'transparent',
+          lineColor: '#64748b',
+        },
+        themeCSS: `
+          .node foreignObject div, .node foreignObject div * { color: #ffffff !important; }
+          .edgeLabel { color: #ffffff !important; background: transparent !important; }
+          .edgeLabel span { color: #ffffff !important; }
+        `,
+      });
+
+      for (const pre of preBlocks) {
+        const definition = pre.textContent || '';
+        const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
+        const { svg } = await mermaid.render(id, definition);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mermaid';
+        wrapper.innerHTML = svg;
+        pre.replaceWith(wrapper);
+      }
+    }
+    document.addEventListener('astro:page-load', () => {
+      renderMermaid();
+    });
+  </script>
 </BaseLayout>
