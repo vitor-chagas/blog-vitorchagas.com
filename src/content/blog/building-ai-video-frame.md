@@ -38,12 +38,17 @@ Beyond the web app, I also published it as an API on <a href="https://rapidapi.c
 Here's what that looks like in practice:
 
 <div class="not-prose video-compare" style="margin: 2.5rem 0; position:relative;">
-  <div style="display:flex; gap:1.5rem; justify-content:center; align-items:center; flex-wrap:wrap;">
+  <div style="display:flex; gap:0; justify-content:center; align-items:center; flex-wrap:wrap;">
     <div style="text-align:center; flex:1; min-width:200px;">
       <video src="/videos/ai-video-frame-demo1-original.mp4" autoplay muted loop playsinline
         style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
       </video>
       <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Original (16:9)</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 0.75rem; align-self:stretch;">
+      <div style="flex:1; width:2px; background:linear-gradient(to bottom, transparent, #d1d5db, #d1d5db, transparent); border-radius:1px;"></div>
+      <div style="background:#18181b; color:#fff; font-size:0.65rem; font-weight:700; letter-spacing:0.05em; padding:0.3rem 0.5rem; border-radius:9999px; border:2px solid #d1d5db; white-space:nowrap; margin:0.5rem 0;">VS</div>
+      <div style="flex:1; width:2px; background:linear-gradient(to bottom, transparent, #d1d5db, #d1d5db, transparent); border-radius:1px;"></div>
     </div>
     <div style="text-align:center; flex:0 1 auto; min-width:140px; max-width:240px;">
       <video src="/videos/ai-video-frame-demo1-reframed.mp4" autoplay muted loop playsinline
@@ -180,12 +185,17 @@ I format these into ASS subtitle files (a format that supports rich styling) wit
 Here's the smoothing in action — notice how the crop follows the subject without any jitter:
 
 <div class="not-prose video-compare" style="margin: 2.5rem 0; position:relative;">
-  <div style="display:flex; gap:1.5rem; justify-content:center; align-items:center; flex-wrap:wrap;">
+  <div style="display:flex; gap:0; justify-content:center; align-items:center; flex-wrap:wrap;">
     <div style="text-align:center; flex:1; min-width:200px;">
       <video src="/videos/ai-video-frame-demo2-original.mp4" autoplay muted loop playsinline
         style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
       </video>
       <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Original (16:9)</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 0.75rem; align-self:stretch;">
+      <div style="flex:1; width:2px; background:linear-gradient(to bottom, transparent, #d1d5db, #d1d5db, transparent); border-radius:1px;"></div>
+      <div style="background:#18181b; color:#fff; font-size:0.65rem; font-weight:700; letter-spacing:0.05em; padding:0.3rem 0.5rem; border-radius:9999px; border:2px solid #d1d5db; white-space:nowrap; margin:0.5rem 0;">VS</div>
+      <div style="flex:1; width:2px; background:linear-gradient(to bottom, transparent, #d1d5db, #d1d5db, transparent); border-radius:1px;"></div>
     </div>
     <div style="text-align:center; flex:0 1 auto; min-width:140px; max-width:240px;">
       <video src="/videos/ai-video-frame-demo2-reframed.mp4" autoplay muted loop playsinline
