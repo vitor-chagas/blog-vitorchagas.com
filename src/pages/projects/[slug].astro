@@ -146,12 +146,12 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
         const primary = videos[0];
         const secondary = videos[1];
 
-        // Sync: keep both videos at the same time
-        primary.addEventListener('timeupdate', () => {
-          if (Math.abs(primary.currentTime - secondary.currentTime) > 0.15) {
+        // Light sync: only correct if videos drift significantly
+        setInterval(() => {
+          if (Math.abs(primary.currentTime - secondary.currentTime) > 0.5) {
             secondary.currentTime = primary.currentTime;
           }
-        });
+        }, 3000);
 
         const iconMuted = btn.querySelector('.icon-muted');
         const iconUnmuted = btn.querySelector('.icon-unmuted');
