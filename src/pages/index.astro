@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TickerTape from '../components/TickerTape.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('blog'))
@@ -157,24 +158,7 @@ const stack = ['Python', 'Spark', 'Cloud', 'Databricks', 'Databases', 'Docker', 
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       {projects.map((project) => (
-        <a
-          href={`/projects/${project.id}`}
-          class="group block bg-card border border-card-border rounded-xl overflow-hidden hover:border-muted transition-colors duration-200"
-        >
-          <div class="aspect-[4/3] bg-tag-bg overflow-hidden">
-            <img
-              src={project.data.coverImage}
-              alt={project.data.title}
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <div class="p-4">
-            <h2 class="text-base font-semibold text-heading">{project.data.title}</h2>
-            <p class="text-sm text-subtle mt-2 leading-relaxed line-clamp-2">
-              {project.data.description}
-            </p>
-          </div>
-        </a>
+        <ProjectCard project={project} />
       ))}
     </div>
   </section>
