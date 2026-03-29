@@ -2,7 +2,7 @@
 title: "How a Palmeiras Championship Sparked an AI-Powered SaaS, and What I Learned Building It"
 pubDate: 2026-03-28
 description: "How a frustrating YouTube-to-Instagram experience led me to build an AI-powered video reframing tool"
-tags: ["ai", "saas", "python", "computer-vision", "side-project"]
+tags: ["react", "typescript", "python", "mediapipe", "opencv", "computer-vision", "docker", "postgresql", "vite", "tailwindcss", "ffmpeg", "stripe"]
 ---
 
 A few weeks ago, my childhood team, Palmeiras, won the Campeonato Paulista 2026. If you know me, you know this is basically a national holiday in my world.
@@ -27,13 +27,36 @@ That's how **AI Video Frame** was born.
 
 ## What is AI Video Frame?
 
-[aivideoframe.com](https://aivideoframe.com) is a web tool that takes any video and intelligently reframes it to a different aspect ratio, keeping the main subject centered the whole time using AI pose detection.
+<a href="https://aivideoframe.com" target="_blank" rel="noopener noreferrer">aivideoframe.com</a> is a web tool that takes any video and intelligently reframes it to a different aspect ratio, keeping the main subject centered the whole time using AI pose detection.
 
 You upload a video. You pick a ratio, whether that's 9:16 for TikTok/Reels, 1:1 for a square post, 16:9 for YouTube, or a few others. The AI tracks the person in the video and crops it frame by frame, following their movements smoothly. You download the result.
 
 It also has an optional **subtitle generator** powered by OpenAI Whisper, with automatic language detection and translation to 20+ languages, rendered as karaoke-style captions that highlight each word as it's spoken.
 
-Beyond the web app, I also published it as an API on [RapidAPI](https://rapidapi.com) so developers can integrate it into their own tools.
+Beyond the web app, I also published it as an API on <a href="https://rapidapi.com/vitorvieirachagas/api/ai-video-frame-api/playground/apiendpoint_c339886f-6712-435a-a953-a71fe1fce052" target="_blank" rel="noopener noreferrer">RapidAPI</a> so developers can integrate it into their own tools.
+
+Here's what that looks like in practice:
+
+<div class="not-prose video-compare" style="margin: 2.5rem 0; position:relative;">
+  <div style="display:flex; gap:1.5rem; justify-content:center; align-items:center; flex-wrap:wrap;">
+    <div style="text-align:center; flex:1; min-width:200px;">
+      <video src="/videos/ai-video-frame-demo1-original.mp4" autoplay muted loop playsinline
+        style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
+      </video>
+      <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Original (16:9)</p>
+    </div>
+    <div style="text-align:center; flex:0 1 auto; min-width:140px; max-width:240px;">
+      <video src="/videos/ai-video-frame-demo1-reframed.mp4" autoplay muted loop playsinline
+        style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
+      </video>
+      <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Reframed (9:16)</p>
+    </div>
+  </div>
+  <button class="video-sound-toggle" style="position:absolute; top:0.75rem; right:0.75rem; background:rgba(0,0,0,0.55); border:none; border-radius:50%; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s;" aria-label="Toggle sound">
+    <svg class="icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    <svg class="icon-unmuted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  </button>
+</div>
 
 ---
 
@@ -89,7 +112,7 @@ This is the most interesting part technically, so let me walk through it.
 
 ### Step 1: face detection with MediaPipe
 
-[MediaPipe](https://mediapipe.dev) is a Google library for real-time computer vision tasks. I use its Tasks API with two models: a face detector as the primary method, and a pose landmarker as fallback for when the face isn't visible (person turned away, wearing a helmet, looking down).
+<a href="https://mediapipe.dev" target="_blank" rel="noopener noreferrer">MediaPipe</a> is a Google library for real-time computer vision tasks. I use its Tasks API with two models: a face detector as the primary method, and a pose landmarker as fallback for when the face isn't visible (person turned away, wearing a helmet, looking down).
 
 The face detector picks the largest face in the frame, which is usually the person closest to the camera. From the bounding box I compute the center position, and that becomes the target for where the crop window should be centered. When face detection fails, the pose model kicks in and estimates the center from body landmarks like shoulders and hips.
 
@@ -154,6 +177,29 @@ The subtitle feature uses OpenAI's Whisper API to transcribe the audio. Whisper 
 
 I format these into ASS subtitle files (a format that supports rich styling) with karaoke-style highlighting, each word lights up as it's spoken. For non-English targets, I pass the transcription through GPT-4o-mini for translation first, though this loses the word-level timing so it falls back to standard subtitle formatting.
 
+Here's the smoothing in action — notice how the crop follows the subject without any jitter:
+
+<div class="not-prose video-compare" style="margin: 2.5rem 0; position:relative;">
+  <div style="display:flex; gap:1.5rem; justify-content:center; align-items:center; flex-wrap:wrap;">
+    <div style="text-align:center; flex:1; min-width:200px;">
+      <video src="/videos/ai-video-frame-demo2-original.mp4" autoplay muted loop playsinline
+        style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
+      </video>
+      <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Original (16:9)</p>
+    </div>
+    <div style="text-align:center; flex:0 1 auto; min-width:140px; max-width:240px;">
+      <video src="/videos/ai-video-frame-demo2-reframed.mp4" autoplay muted loop playsinline
+        style="width:100%; border-radius:0.75rem; border:1px solid #ebebeb;">
+      </video>
+      <p style="font-size:0.8rem; color:#9b9b9b; margin-top:0.5rem;">Reframed (9:16)</p>
+    </div>
+  </div>
+  <button class="video-sound-toggle" style="position:absolute; top:0.75rem; right:0.75rem; background:rgba(0,0,0,0.55); border:none; border-radius:50%; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s;" aria-label="Toggle sound">
+    <svg class="icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    <svg class="icon-unmuted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  </button>
+</div>
+
 ---
 
 ## Production-grade features (because this is running live)
@@ -174,7 +220,7 @@ A few things worth highlighting because they're often skipped in tutorials but m
 
 ## Deployment
 
-The whole thing runs in a single Docker container deployed on [Railway.io](https://railway.io).
+The whole thing runs in a single Docker container deployed on <a href="https://railway.com" target="_blank" rel="noopener noreferrer">Railway</a>.
 
 The Docker image is built from a `node:20-slim` base, with Python 3 installed alongside it. System dependencies like FFmpeg and the OpenCV native libraries are installed at build time. The Python dependencies go into a virtual environment inside the container, and the Node.js app starts everything up.
 
@@ -195,7 +241,7 @@ I set up a GitHub Actions pipeline that runs on every push. The jobs are:
 5. **Build:** Only runs if all three test suites pass. Verifies the full Vite + TypeScript compilation succeeds.
 6. **RapidAPI E2E tests:** Runs only on pushes to `main`, after a successful build. Hits the live production API end-to-end: upload, process, poll, download, delete, and credit exhaustion. A lightweight smoke test to confirm the deployment is healthy.
 
-The test runner is [Vitest](https://vitest.dev). It's fast, has great TypeScript support, and fits naturally into a Vite project.
+The test runner is <a href="https://vitest.dev" target="_blank" rel="noopener noreferrer">Vitest</a>. It's fast, has great TypeScript support, and fits naturally into a Vite project.
 
 The pipeline isn't complicated, but having it in place means I catch type errors and regressions before they hit the main branch. For a solo project, that matters more than it sounds. There's no code review, so the CI is your second pair of eyes.
 
@@ -207,7 +253,7 @@ Yes. The repo is public on GitHub and you can do whatever you want with it: fork
 
 This project isn't primarily about making money. It's about learning web development as someone who lives in the data and infrastructure world, building something end-to-end, and sharing the process. The fact that it has a monetization model is a bonus. It forces you to think about real problems like auth, payments, rate limiting, and uptime in a way that hobby projects don't.
 
-→ [github.com/vitorchagas/ai-video-frame](https://github.com/vitorchagas/ai-video-frame) *(feel free to fork, contribute, or try to hack it)*
+→ <a href="https://github.com/vitor-chagas/ai-video-frame" target="_blank" rel="noopener noreferrer">github.com/vitor-chagas/ai-video-frame</a> *(feel free to fork, contribute, or try to hack it)*
 
 ---
 
@@ -229,10 +275,10 @@ A few honest notes after building this:
 
 If you've ever tried to share a video clip from YouTube to Instagram and been frustrated by the aspect ratio mess, give it a try.
 
-[aivideoframe.com](https://aivideoframe.com)
+<a href="https://aivideoframe.com" target="_blank" rel="noopener noreferrer">aivideoframe.com</a>
 
 And if you're a developer who wants to integrate it into something, it's available as an API on RapidAPI too.
 
 ---
 
-*I'm a data and DevOps engineer working at a bank in the Netherlands. I built this as a side project to learn more about web development and MicroSaaS. If you have questions, feedback, or just want to talk tech, find me on [LinkedIn](https://www.linkedin.com/in/vitorvchagas/).*
+*I'm a data and DevOps engineer working at a bank in the Netherlands. I built this as a side project to learn more about web development and MicroSaaS. If you have questions, feedback, or just want to talk tech, find me on <a href="https://www.linkedin.com/in/vitorvchagas/" target="_blank" rel="noopener noreferrer">LinkedIn</a>.*
