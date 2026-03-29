@@ -58,6 +58,7 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
       prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent-hover hover:prose-a:underline
       prose-code:text-accent-hover prose-code:font-normal prose-code:bg-code-bg prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
       prose-pre:bg-code-bg prose-pre:border prose-pre:border-border prose-pre:rounded-lg
+      [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:rounded-none [&_pre_code]:text-white
       prose-blockquote:border-border prose-blockquote:text-subtle
       prose-hr:border-border
       prose-table:text-sm
@@ -73,4 +74,100 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
       </a>
     </footer>
   </article>
+
+  <script>
+    async function renderMermaid() {
+      const preBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
+      if (preBlocks.length === 0) return;
+
+      const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          nodeBorder: '#f97316',
+          edgeLabelBackground: 'transparent',
+          lineColor: '#64748b',
+        },
+        themeCSS: `
+          .node foreignObject div, .node foreignObject div * { color: #ffffff !important; }
+          .edgeLabel { color: #ffffff !important; background: transparent !important; }
+          .edgeLabel span { color: #ffffff !important; }
+        `,
+      });
+
+      for (const pre of preBlocks) {
+        const definition = pre.textContent || '';
+        const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
+        const { svg } = await mermaid.render(id, definition);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mermaid';
+        wrapper.innerHTML = svg;
+        pre.replaceWith(wrapper);
+      }
+    }
+    function initVideoCompare() {
+      const allContainers = document.querySelectorAll('.video-compare');
+
+      allContainers.forEach(container => {
+        if (container.dataset.initialized) return;
+        container.dataset.initialized = 'true';
+
+        const videos = Array.from(container.querySelectorAll('video'));
+        const btn = container.querySelector('.video-sound-toggle');
+        if (videos.length < 2 || !btn) return;
+
+        const primary = videos[0];
+        const secondary = videos[1];
+
+        // Sync: keep both videos at the same time
+        primary.addEventListener('timeupdate', () => {
+          if (Math.abs(primary.currentTime - secondary.currentTime) > 0.15) {
+            secondary.currentTime = primary.currentTime;
+          }
+        });
+
+        const iconMuted = btn.querySelector('.icon-muted');
+        const iconUnmuted = btn.querySelector('.icon-unmuted');
+
+        btn.addEventListener('click', () => {
+          const willUnmute = primary.muted;
+
+          if (willUnmute) {
+            // Mute all other video-compare sections first
+            allContainers.forEach(other => {
+              if (other === container) return;
+              const otherVideos = other.querySelectorAll('video');
+              const otherBtn = other.querySelector('.video-sound-toggle');
+              otherVideos.forEach(v => { v.muted = true; });
+              if (otherBtn) {
+                const otherMutedIcon = otherBtn.querySelector('.icon-muted');
+                const otherUnmutedIcon = otherBtn.querySelector('.icon-unmuted');
+                if (otherMutedIcon) otherMutedIcon.style.display = 'block';
+                if (otherUnmutedIcon) otherUnmutedIcon.style.display = 'none';
+              }
+            });
+          }
+
+          primary.muted = !willUnmute;
+          secondary.muted = true; // always keep secondary muted
+          if (willUnmute) primary.play();
+
+          if (iconMuted && iconUnmuted) {
+            iconMuted.style.display = willUnmute ? 'none' : 'block';
+            iconUnmuted.style.display = willUnmute ? 'block' : 'none';
+          }
+        });
+
+        // Hover effect
+        btn.addEventListener('mouseenter', () => btn.style.background = 'rgba(0,0,0,0.75)');
+        btn.addEventListener('mouseleave', () => btn.style.background = 'rgba(0,0,0,0.55)');
+      });
+    }
+
+    document.addEventListener('astro:page-load', () => {
+      renderMermaid();
+      initVideoCompare();
+    });
+  </script>
 </BaseLayout>
